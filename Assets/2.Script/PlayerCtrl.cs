@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 [System.Serializable]
@@ -23,10 +24,20 @@ public class PlayerCtrl : MonoBehaviour
 
     public Anim anim;
     public Animation _animation;
-    
+
+    public int hp = 100;
+
+    public delegate void PlayerDieHandler();
+    public static event PlayerDieHandler OnPlayerDie;
+
+    private int initHp;
+    public Image imgHpbar;
+
     // Use this for initialization
     void Start()
     {
+        initHp = hp;
+
         tr = GetComponent<Transform>();
 
         _animation = GetComponentInChildren<Animation>();
@@ -41,8 +52,8 @@ public class PlayerCtrl : MonoBehaviour
         h = Input.GetAxis("Horizontal");
         v = Input.GetAxis("Vertical");
 
-        Debug.Log("H=" + h.ToString());
-        Debug.Log("V=" + v.ToString());
+        //Debug.Log("H=" + h.ToString());
+        //Debug.Log("V=" + v.ToString());
 
         Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
         tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self);
@@ -71,5 +82,32 @@ public class PlayerCtrl : MonoBehaviour
 
     }
 
+    void OnTriggerEnter(Collider coll)
+    {
+        if(coll.gameObject.tag == "PUNCH")
+        {
+            hp -= 10;
+            imgHpbar.fillAmount = (float)hp / (float)initHp;
+            Debug.Log("Player HP = " + hp.ToString());
 
+            if(hp <= 0)
+            {
+                PlayerDie();
+            }
+        }
+    }
+
+    void PlayerDie()
+    {
+        Debug.Log("Player Die!!");
+
+        /*GameObject[] monsters = GameObject.FindGameObjectsWithTag("MONSTER");
+
+        foreach(GameObject monster in monsters)
+        {
+            monster.SendMessage("OnPlayerDie", SendMessageOptions.DontRequireReceiver);
+        }*/
+
+        OnPlayerDie();
+    }
 }
