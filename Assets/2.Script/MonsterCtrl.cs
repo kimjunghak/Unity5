@@ -24,14 +24,11 @@ public class MonsterCtrl : MonoBehaviour {
     private GameUI gameUI;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         monsterTr = this.gameObject.GetComponent<Transform>();
         playerTr = GameObject.FindWithTag("Player").GetComponent<Transform>();
         nvAgent = this.gameObject.GetComponent<NavMeshAgent>();
         animator = this.gameObject.GetComponent<Animator>();
-
-        StartCoroutine(this.CheckMonsterState());
-        StartCoroutine(this.MonsterAction());
 
         gameUI = GameObject.Find("GameUI").GetComponent<GameUI>();
 	}
@@ -84,28 +81,26 @@ public class MonsterCtrl : MonoBehaviour {
             yield return null;
         }
     }
-
-    void OnCollisionEnter(Collision coll)
+    
+    void OnDamage(object[] _params)
     {
-        if(coll.gameObject.tag == "BULLET")
+        Debug.Log(string.Format("Hit ray {0} : {1}", _params[0], _params[1]));
+
+        CreateBloodEffect((Vector3)_params[0]);
+
+        hp -= (int)_params[1];
+        if(hp <= 0)
         {
-            CreateBloodEffect(coll.transform.position);
-            Destroy(coll.gameObject);
-            animator.SetTrigger("IsHit");
-
-            gameUI.DispScore(10);
-
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-
-            if (hp <= 0)
-            {
-                MonsterDie();
-            }
+            MonsterDie();
         }
-    }
 
+        animator.SetTrigger("IsHit");
+    }
+        
     void MonsterDie()
     {
+        gameObject.tag = "Untagged";
+
         StopAllCoroutines();
 
         isDie = true;
@@ -120,7 +115,26 @@ public class MonsterCtrl : MonoBehaviour {
             coll.enabled = false;
         }
 
-        //gameUI.DispScore(50);
+        gameUI.DispScore(50);
+
+        StartCoroutine(this.PushObjectPool());
+    }
+
+    IEnumerator PushObjectPool()
+    {
+        yield return new WaitForSeconds(3.0f);
+
+        isDie = false;
+        hp = 100;
+        gameObject.tag = "MONSTER";
+        monsterState = MonsterState.idle;
+        gameObject.GetComponentInChildren<CapsuleCollider>().enabled = true;
+
+        foreach(Collider coll in gameObject.GetComponentsInChildren<SphereCollider>())
+        {
+            coll.enabled = true;
+        }
+        gameObject.SetActive(false);
     }
 
     void CreateBloodEffect(Vector3 pos)
@@ -142,6 +156,9 @@ public class MonsterCtrl : MonoBehaviour {
     void OnEnable()
     {
         PlayerCtrl.OnPlayerDie += this.OnPlayerDie;
+
+        StartCoroutine(this.CheckMonsterState());
+        StartCoroutine(this.MonsterAction());
     }
 
     void OnDisalbe()

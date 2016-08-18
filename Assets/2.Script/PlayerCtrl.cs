@@ -33,12 +33,16 @@ public class PlayerCtrl : MonoBehaviour
     private int initHp;
     public Image imgHpbar;
 
+    private GameMgr gameMgr;
+
     // Use this for initialization
     void Start()
     {
         initHp = hp;
 
         tr = GetComponent<Transform>();
+
+        gameMgr = GameObject.Find("GameManager").GetComponent<GameMgr>();
 
         _animation = GetComponentInChildren<Animation>();
 
@@ -101,13 +105,8 @@ public class PlayerCtrl : MonoBehaviour
     {
         Debug.Log("Player Die!!");
 
-        /*GameObject[] monsters = GameObject.FindGameObjectsWithTag("MONSTER");
-
-        foreach(GameObject monster in monsters)
-        {
-            monster.SendMessage("OnPlayerDie", SendMessageOptions.DontRequireReceiver);
-        }*/
-
         OnPlayerDie();
+
+        GameMgr.instance.isGameOver = true;
     }
 }
