@@ -75,6 +75,7 @@
     <Compile Include="Assets\2.Script\FollowCam.cs" />
     <Compile Include="Assets\2.Script\GameMgr.cs" />
     <Compile Include="Assets\2.Script\GameUI.cs" />
+    <Compile Include="Assets\2.Script\LaserBeam.cs" />
     <Compile Include="Assets\2.Script\MonsterCtrl.cs" />
     <Compile Include="Assets\2.Script\MyGizmo.cs" />
     <Compile Include="Assets\2.Script\PlayerCtrl.cs" />

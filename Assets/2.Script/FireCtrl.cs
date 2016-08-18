@@ -39,6 +39,14 @@ public class FireCtrl : MonoBehaviour {
 
                     hit.collider.gameObject.SendMessage("OnDamage", _params, SendMessageOptions.DontRequireReceiver);
                 }
+
+                if(hit.collider.tag == "BARREL")
+                {
+                    object[] _params = new object[2];
+                    _params[0] = firePos.position;
+                    _params[1] = hit.point;
+                    hit.collider.gameObject.SendMessage("OnDamage", _params, SendMessageOptions.DontRequireReceiver);
+                }
             }
         }
 	}

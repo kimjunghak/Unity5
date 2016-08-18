@@ -18,16 +18,18 @@ public class BarrelCtrl : MonoBehaviour {
         GetComponentInChildren<MeshRenderer>().material.mainTexture = textures[idx];
 	}
 	
-    void OnCollisionEnter(Collision coll)
+    void OnDamage(object[] _params)
     {
-        if(coll.collider.tag == "BULLET")
-        {
-            Destroy(coll.gameObject);
+        Vector3 firePos = (Vector3)_params[0];
+        Vector3 hitPos = (Vector3)_params[1];
+        Vector3 incomeVector = hitPos - firePos;
 
-            if(++hitCount >= 3)
-            {
-                ExpBarrel();
-            }
+        incomeVector = incomeVector.normalized;
+        GetComponent<Rigidbody>().AddForceAtPosition(incomeVector * 1000f, hitPos);
+
+        if(++hitCount >= 3)
+        {
+            ExpBarrel();
         }
     }
 
